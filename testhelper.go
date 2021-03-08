@@ -29,6 +29,10 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	}
 
 	testingT := analysisutil.ObjectOf(pass, "testing", "T")
+	if testingT == nil {
+		return nil, nil
+	}
+
 	testingTPtr := types.NewPointer(testingT.Type())
 	helperObj, _, _ := types.LookupFieldOrMethod(testingT.Type(), true, testingT.Pkg(), "Helper")
 	helper, _ := helperObj.(*types.Func)
