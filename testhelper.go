@@ -59,7 +59,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			continue
 		}
 
-		if !isCalled(fun, helper) {
+		if hasTestingT(fun.Params, testingTPtr) && !isCalled(fun, helper) {
 			pass.Reportf(fun.Pos(), "%s is a test helper but it does not call t.Helper", fun.Name())
 		}
 	}
@@ -73,6 +73,15 @@ func isCalled(fun *ssa.Function, helper *types.Func) bool {
 			if analysisutil.Called(instr, nil, helper) {
 				return true
 			}
+		}
+	}
+	return false
+}
+
+func hasTestingT(params []*ssa.Parameter, testingTPtr types.Type) bool {
+	for _, p := range params {
+		if types.Identical(testingTPtr, p.Type()) {
+			return true
 		}
 	}
 	return false
